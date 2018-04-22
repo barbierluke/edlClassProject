@@ -32,6 +32,8 @@ class Tiva_Base:
         self.cv_pub = rospy.Publisher('/cv', Empty, queue_size=10)
         self.loop_pub = rospy.Publisher('/start', Empty, queue_size=10)
         rospy.loginfo("tiva node ready")
+        self.tiva.write('*')
+        rospy.loginfo("Sending start condition to Tiva")
         rospy.spin()
             
     def loop_callback(self, ros_msg):
