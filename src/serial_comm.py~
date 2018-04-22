@@ -1,0 +1,53 @@
+import serial
+import rospy
+from dream_team.msg import Wheel
+from std_msgs.msg import UInt8
+
+"""
+Listens to the Tiva's state and publishes it to /state as a uint8
+Subscribes to /wheel and decodes the messages to send to the tiva
+"""
+
+class Motor_Controller:
+    
+    def __init__(self, ttyStr='/dev/tiva'):
+        self.sub = rospy.Subscriber('/wheel', Wheel, self.wheel_callback)
+        pub = rospy.Publisher('/state', UInt8, queue_size=10)
+        self.tiva = serial.Serial(ttyStr,timeout=0.1) # Should do 9600,8,N,1
+
+        state = None
+        prev_state = state
+        while not rospy.is_shutdown():
+            state = int(self.tiva.read(1))
+            rospy.loginfo("State: "+str(state))
+
+            # The state has changed so publish it
+            if state != prev_state:
+                msg = UInt8()
+                msg.data = state
+                pub.publish(msg)
+            prev_state = state
+            
+        self.tiva.close()
+        
+    def wheel_callback(self, msg):
+        left = msg.left
+        right = msg.right
+        c = encode_msg(left, right)
+        if c != None:
+            self.tiva.write(c)
+
+    def encode_msg(left, right):
+        if left > 5 or right > 5:
+            rospy.logerr("Wheel speed higher than possible: " + str(left) + " " + str(right))
+            return None
+        if left==0 and right==0:
+            return 'a'
+        sum = left+right
+        c = (sum - 5)*2 + 98
+        if right > left:
+            c = c + 1
+        return chr(c)
+
+if __name__ == "__main__":
+    a = Motor_Controller()
