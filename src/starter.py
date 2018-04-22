@@ -8,7 +8,7 @@ class Starter:
     def __init__(self):
         rospy.init_node('starter_node')
         pub = rospy.Publisher('/start', Empty, queue_size=10)
-        rospy.sleep(1)
+        rospy.sleep(3)
         pub.publish(Empty())
         rospy.loginfo("Message Published")
         # Do nothing here after we start everything...
