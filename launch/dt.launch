@@ -1,0 +1,5 @@
+<launch>
+
+	<node name="tiva_node" pkg="dream_team" type="tiva_base.py" output="screen" />
+	<node name="starter_node" pkg="dream_team" type="starter.py" />
+</launch>

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rospy
 import serial
 from std_msgs.msg import Int16
